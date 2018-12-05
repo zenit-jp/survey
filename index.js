@@ -1,27 +1,43 @@
-const yesSubmit = function() {
-firebase.database().ref("questions/question1/yes").once("value").then(result => {
+var yescount, nocount;
+
+firebase.database().ref("questions/question1").once("value").then(result => {
 	if(result.val()){
-	   var yescount = {
-		   count: result.val().count + 1};
-	   firebase.database().ref("questions/question1/yes").set(yescount);
+		yescount = result.val().yes;
+		nocount = result.val().no;
 		}
-	
 	}).catch(err => {
 		console.log(err);
-	});
+});
+
+
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+
+const showResults = function() {
+	buttons = document.getElementById("buttons");
+	buttons.innerHTML = "<div id='piechart'>";
+
+  var data = google.visualization.arrayToDataTable([
+  ['Task', 'Hours per Day'],
+  ['Yes', yescount],
+  ['No', nocount],
+  ])
+  var options = {'title':'Results', 'width':550, 'height':400};
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+  chart.draw(data, options);
+}
+
+//TODO: firebase increment serially
+const yesSubmit = function() {
+	yescount++;
+	firebase.database().ref("questions/question1").set({yes: yescount, no: nocount});
+	showResults();
 };
 
 const noSubmit = function() {
-firebase.database().ref("questions/question1/no").once("value").then(result => {
-	if(result.val()){
-	   var nocount = {
-		   count: result.val().count + 1};
-	   firebase.database().ref("questions/question1/no").set(nocount);
-		}
-	
-	}).catch(err => {
-		console.log(err);
-	});
+	nocount++;
+	firebase.database().ref("questions/question1").set({yes: yescount, no: nocount});
+	showResults();
 }
 
 var yes = document.getElementById("yes");

@@ -1,2 +1,1 @@
-# survey
-QR code
+http://fukuno.jig.jp/2012/qrmaker#https://zenit-jp.github.io/survey/
